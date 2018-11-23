@@ -1,20 +1,20 @@
 
 public class Vertex {
 
-	protected StringBuffer _strUniqueID;
-	protected StringBuffer _strData; 
+	protected String _strUniqueID;
+	protected String _strData; 
 	protected int _nX,_nY;
-	public StringBuffer getUniqueID( ){
+	public String getUniqueID( ){
 		return _strUniqueID;
-		 }
+	}
 
-		 public StringBuffer getData( ){
+	public String getData( ){
 		 return _strData;
-		 }
-		 public int getX( ){
+	}
+	public int getX( ){
 		 return _nX;
-		 }
-		 public int getY( ){
+	}
+	public int getY( ){
 		 return _nY;
     } 
 	public static void main(String[] args){
