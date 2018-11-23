@@ -4,6 +4,20 @@ public class Vertex {
 	protected String _strUniqueID;
 	protected String _strData; 
 	protected int _nX,_nY;
+	public Vertex(String _strUniqueID,String _strData,int _ny,int nx){
+		this._strUniqueID=_strUniqueID;
+		this._strData=_strData;
+		this._nX=nx;
+		this._nY=_ny;
+		
+		
+	}
+	public Vertex(String _strUniqueID,String _strData){
+		this._strUniqueID=_strUniqueID;
+		this._strData=_strData;
+		
+		
+	}
 	public String getUniqueID( ){
 		return _strUniqueID;
 	}
