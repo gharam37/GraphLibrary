@@ -4,13 +4,13 @@ public class Graph {
 
 	private String LibraryName;
 	private String LibraryVersion;
-    private Vector<Vertex> Vertices;
-    private Vector<Edge>  Edges;
+    private Vector<Vertex> Vertices=new Vector<Vertex>(50,1);
+    private Vector<Edge>  Edges= new  Vector<Edge> (50,1) ;
 	public String getLibraryName( ){
 		
 		return LibraryName;
 	}
-
+    
 	
 	public Vector<Vertex> vertices()throws GraphException
 	
@@ -50,7 +50,8 @@ public class Graph {
 					Opposite = Edges.get(i).Vertex2; 
 				break;
 				}
-				else{
+				else if(Edges.get(i).Vertex2._strUniqueID.equals(strVertexUniqueID))
+						{
 					Opposite = Edges.get(i).Vertex1; 
 
 					break;
@@ -59,7 +60,11 @@ public class Graph {
 			}
 			
 		}
-		
+		if(Opposite==null){
+			throw new GraphException("Edge or Vertix not found");
+
+			
+		}
 		return Opposite;
 	}
 	public void insertVertex(String strUniqueID,
@@ -77,13 +82,16 @@ public class Graph {
 		int countFound =0;
 		Vertex Vertex1=null;
 		Vertex Vertex2=null;
-		for(int i=0;i<Edges.size();i++){
+		for(int i=0;i<Vertices.size();i++){
 			if(Vertices.get(i).getUniqueID().equals(strVertex1UniqueID)){
 				countFound++;
+				System.out.println(countFound);
 				Vertex1 = Vertices.get(i);
 			}
 			if(Vertices.get(i).getUniqueID().equals(strVertex2UniqueID)){
 				countFound++;
+				System.out.println(countFound);
+
 				Vertex2 = Vertices.get(i);
 
 			}
@@ -120,7 +128,7 @@ public class Graph {
 			if(Vertices.get(i).getUniqueID().equals(strVertexUniqueID)){
 				found =true;
 				Vertices.remove(Vertices.get(i));
-				for(int j=0;i<Edges.size();j++){
+				for(int j=0;j<Edges.size();j++){
 					String VertexID1=Edges.get(j).Vertex1.getUniqueID();
 					String VertexID2=Edges.get(j).Vertex2.getUniqueID();
 
@@ -146,7 +154,7 @@ public class Graph {
 		for(int i=0;i<Vertices.size();i++){
 			if(Vertices.get(i).getUniqueID().equals(strVertexUniqueID)){
 				found=true;
-				for(int j=0;i<Edges.size();j++){
+				for(int j=0;j<Edges.size();j++){
 					String VertexID1=Edges.get(j).Vertex1.getUniqueID();
 					String VertexID2=Edges.get(j).Vertex2.getUniqueID();
 
@@ -161,19 +169,39 @@ public class Graph {
 			}
 
 		}
+		if(!found){
+			throw new GraphException("Couldn't find Vertex");
+		}
 		return incidentEdges;
 	}
-	public static void main(String[]args){
-		 // create default vector 
-        Vector v = new Vector(); 
-  
-        v.add(1); 
-        v.add(2); 
-        v.add("geeks"); 
-        v.add("forGeeks"); 
-        v.add(3); 
-  
-        System.out.println("Vector is " + v); 
-		System.out.println("Printing From Graph");
+	public static void main(String[]args) throws GraphException{
+		Graph Graph=new Graph();
+
+		Graph.insertVertex("1","1",0,0);
+		Graph.insertVertex("2","2",0,0);
+
+        Graph.insertEdge("1", "2", "1", "5", 1);
+        //Graph.removeEdge("1");
+		//Graph.removeVertex("2");
+		//Graph.removeVertex("2");
+        
+		//System.out.println(Graph.opposite("8","1"));
+        Vertex [] Vertices= Graph.endVertices("1");
+        for(int i=0;i<Graph.incidentEdges("1").size();i++){
+		System.out.println(Graph.incidentEdges("1").get(i));
+	   }
+        
+		/*for(int i=0;i<Graph.edges().size();i++){
+			System.out.println(Graph.edges().get(i));
+		}*/
+		/*for(int i=0;i<Graph.vertices().size();i++){
+			System.out.println(Graph.vertices().get(i));
+		}*/
+        
+		/*for(int i=0;i<Graph.Edges.size();i++){
+			System.out.println(Graph.Edges.get(i));
+		}*/
+
+
 	}
 }
