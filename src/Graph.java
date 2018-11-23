@@ -6,6 +6,10 @@ public class Graph {
 	private String LibraryVersion;
     private Vector<Vertex> Vertices=new Vector<Vertex>(50,1);
     private Vector<Edge>  Edges= new  Vector<Edge> (50,1) ;
+    public void dfs(String strStartVertexUniqueID,
+    		Visitor visitor) throws GraphException{
+    	
+    }
 	public String getLibraryName( ){
 		
 		return LibraryName;
