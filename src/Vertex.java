@@ -1,9 +1,20 @@
+import java.util.LinkedList;
+import java.util.Vector;
+
 
 public class Vertex {
 
 	protected String _strUniqueID;
 	protected String _strData; 
 	protected int _nX,_nY;
+	boolean visited=false;
+	
+    @Override
+	public String toString() {
+		return "Vertex [_strUniqueID=" + _strUniqueID  ;
+	}
+	LinkedList<Vertex> Adjeceny = new LinkedList<Vertex> (); //Sisters
+
 	public Vertex(String _strUniqueID,String _strData,int _ny,int nx){
 		this._strUniqueID=_strUniqueID;
 		this._strData=_strData;

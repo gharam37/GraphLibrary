@@ -5,6 +5,8 @@ public class Edge{
  protected int _nEdgeCost; // cost of traversing this edge
  public Vertex Vertex1;
  public Vertex Vertex2;
+  boolean visited=false;
+
 
 	public Edge(String _strUniqueID,String _strData,int cost,Vertex Vertex1,Vertex Vertex2){
 		this._strUniqueID=_strUniqueID;
