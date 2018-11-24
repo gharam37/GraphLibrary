@@ -282,6 +282,28 @@ public class Graph {
 	
 	}
 
+	public static void runTestCase5() throws GraphException{ 
+		
+	Graph g = new Graph( );
+	GradingVisitor gVisitor = new GradingVisitor( );
+	g.insertVertex("1", "1" ,0,0);
+	g.insertVertex("2", "2",0,0 );
+	g.insertVertex("3", "3" ,0,0);
+	g.insertVertex("4", "4" ,0,0);
+	g.insertVertex("0", "0" ,0,0); 
+	g.insertEdge("0","1","1","88",6);
+	g.insertEdge("0","2","2","2", 1);
+	g.insertEdge("1", "2","3","14",14);
+	g.insertEdge("1", "3","4","99",5);
+	g.insertEdge("1", "4","5","4",4);
+	g.insertEdge("4", "3","6","99",5);
+	g.insertEdge("3", "2","7","4",4);
+	//g.insertEdge("4", "5 ", "58", "58", 58);
+	//g.insertEdge("3", "5 ", "34", "34", 34);
+	//g.dfs("1",gVisitor );
+	g.dfs("1", gVisitor);
+	
+	}
 
 
 
@@ -312,7 +334,8 @@ public class Graph {
         for(int i=0;i<Graph.Vertices.size();i++){
     		System.out.println(Graph.Vertices.get(i).Adjeceny.get(0)); //Printing head 
     	}
-        runTestCase1();
+        //runTestCase1();
+        runTestCase5();
     
         /*for(int i=0;i<Graph.incidentEdges("1").size();i++){
 		System.out.println(Graph.incidentEdges("1").get(i));
