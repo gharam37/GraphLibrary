@@ -15,11 +15,11 @@ public class Vertex {
 	}
 	LinkedList<Vertex> Adjeceny = new LinkedList<Vertex> (); //Sisters
 
-	public Vertex(String _strUniqueID,String _strData,int _ny,int nx){
+	public Vertex(String _strUniqueID,String _strData,int nx,int ny){
 		this._strUniqueID=_strUniqueID;
 		this._strData=_strData;
 		this._nX=nx;
-		this._nY=_ny;
+		this._nY=ny;
 		
 		
 	}
