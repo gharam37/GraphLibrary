@@ -8,33 +8,35 @@ public class Graph {
     private Vector<Edge>  Edges= new  Vector<Edge> (50,1) ;
 	private static double bestDistance = Double.POSITIVE_INFINITY;
 	private static Vertex best1, best2;
+	private Vector<String> dfsUniqueId = new Vector<String>();
 
-    public void dfs(String strStartVertexUniqueID,
-    		Visitor visitor) throws GraphException{
-    	Deque<Vertex> VertciesStack = new ArrayDeque<Vertex>();
-    	boolean foundInitialVertex=false;
-    	Vertex FirstVertex=null;
-    	for (int i=0;i<Vertices.size();i++){
-    		if(Vertices.get(i).getUniqueID().equals(strStartVertexUniqueID)){
-    			foundInitialVertex=true;
-    			FirstVertex=Vertices.get(i);
-    			System.out.println(FirstVertex+" "); 
+	public void dfs(String strStartVertexUniqueID, Visitor visitor) throws GraphException {
+		// TODO: ask to remove stack
+		Deque<Vertex> VertciesStack = new ArrayDeque<Vertex>();
+		boolean foundInitialVertex = false;
+		Vertex FirstVertex = null;
+		for (int i = 0; i < Vertices.size(); i++) {
+			if (Vertices.get(i).getUniqueID().equals(strStartVertexUniqueID)) {
+				foundInitialVertex = true;
+				FirstVertex = Vertices.get(i);
+				System.out.println("First Vertex " + FirstVertex + " ");
 
-    		    visitor.visit(FirstVertex);
-    		    VertciesStack.push(FirstVertex);
-    		    for(int j=0;j<FirstVertex.Adjeceny.size();j++){
-    		    	if(!FirstVertex.Adjeceny.get(j).visited){
-    		    		String ID=FirstVertex.Adjeceny.get(j)._strUniqueID;
-    		    		dfs(ID,visitor);
-    		    		
-    		    	}
-    		    	
-    		    }
-    		    
+				visitor.visit(FirstVertex);
+				VertciesStack.push(FirstVertex);
+				dfsUniqueId.add(FirstVertex._strUniqueID);
+				for (int j = 0; j < FirstVertex.Adjeceny.size(); j++) {
+					if (!FirstVertex.Adjeceny.get(j).visited) {
+						String ID = FirstVertex.Adjeceny.get(j)._strUniqueID;
+						dfs(ID, visitor);
+
+					}
+
+				}
+
 			}
-    	}
+		}
 
-    }
+	}
 	public String getLibraryName( ){
 		
 		return LibraryName;
@@ -263,6 +265,47 @@ public class Graph {
     	}
 		
 	}
+	public Vector<PathSegment> pathDFS(String strStartVertexUniqueID, String strEndVertexUniqueID)
+			throws GraphException {
+		Vector<PathSegment> output = new Vector<PathSegment>(50, 1);
+		Vector<Edge> edge1 = new Vector<Edge>();
+		Vector<Edge> edge2 = new Vector<Edge>();
+		PathSegment pathSegment = new PathSegment();
+		GradingVisitor gVisitor = new GradingVisitor();
+
+		// dfs on the points required
+		dfs(strStartVertexUniqueID, gVisitor);
+		// get the edges and the vertices of the dfs between start and end vertex
+		for (int i = 0; i < dfsUniqueId.size() - 1; i++) {
+			//reach the end vertex
+			if (dfsUniqueId.get(i) == strEndVertexUniqueID) {
+				break;
+			}
+
+			edge1 = incidentEdges(dfsUniqueId.get(i));
+			edge2 = incidentEdges(dfsUniqueId.get(i + 1));
+			for (int j = 0; j < edge2.size(); j++) {
+				if (edge1.contains(edge2.get(j))) {
+					pathSegment._edge = edge2.get(j);
+					pathSegment._vertex = getVertexByID(dfsUniqueId.get(i));
+					output.add(pathSegment);
+					System.out.println("PathSegment Edge: "+pathSegment._edge._strUniqueID+"PathSegment Vertex: "+ pathSegment._vertex._strUniqueID);
+
+				}
+			}
+
+		}
+		return output;
+	}
+
+	// a helper method that get a vertex by giving its uniqueID
+	public Vertex getVertexByID(String uniqueId) {
+		for (int i = 0; i < Vertices.size(); i++) {
+			if (Vertices.get(i)._strUniqueID.equals(uniqueId))
+				return Vertices.get(i);
+		}
+		return null;
+	}
 
 	public Vertex[] closestPair() throws GraphException{
     	Vector<Vertex> vertices = this.Vertices;
@@ -316,7 +359,7 @@ public class Graph {
 		double delta2 = closest(verticesByX, verticesByY, aux, mid + 1, hi);
 		double delta = Math.min(delta1, delta2);
 
-		// merge back so that pointsByY[lo..hi] are sorted by y-coordinate
+		// merge back so that verticesByY[lo..hi] are sorted by y-coordinate
 		merge(verticesByY, aux, lo, mid, hi);
 
 		// aux[0..m-1] = sequence of points closer than delta, sorted by y-coordinate
@@ -327,7 +370,7 @@ public class Graph {
 			}
 		}
 
-		// compare each point to its neighbors with y-coordinate closer than delta
+		// compare each vertex to its neighbors with y-coordinate closer than delta
 		for (int i = 0; i < m; i++) {
 			// a geometric packing argument shows that this loop iterates at most 7 times
 			for (int j = i + 1; (j < m) && (aux[j]._nY - aux[i]._nY < delta); j++) {
@@ -404,7 +447,7 @@ public class Graph {
 	Vertex[] out = g.closestPair();
 	System.out.println("Point 1: " + out[0]._strUniqueID);
 	System.out.println("Point 2: " + out[1]._strUniqueID);
-
+	g.pathDFS("1", "3");
 
 	}
 
@@ -432,15 +475,9 @@ public class Graph {
 	Vertex[] out = g.closestPair();
 	System.out.println("Point 1: " + out[0]._strUniqueID);
 	System.out.println("Point 2: " + out[1]._strUniqueID);
+	g.pathDFS("1", "4");
 
 	}
-
-
-
-
-
-
-
 
 	public static void main(String[]args) throws GraphException{
 		Graph Graph=new Graph();
