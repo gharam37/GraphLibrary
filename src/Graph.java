@@ -6,6 +6,8 @@ public class Graph {
 	private String LibraryVersion;
     private Vector<Vertex> Vertices=new Vector<Vertex>(50,1);
     private Vector<Edge>  Edges= new  Vector<Edge> (50,1) ;
+	private static double bestDistance = Double.POSITIVE_INFINITY;
+	private static Vertex best1, best2;
 
     public void dfs(String strStartVertexUniqueID,
     		Visitor visitor) throws GraphException{
@@ -261,15 +263,135 @@ public class Graph {
     	}
 		
 	}
+
+	public Vertex[] closestPair() throws GraphException{
+    	Vector<Vertex> vertices = this.Vertices;
+		int n = vertices.size();
+		if (n <= 1) return null;
+
+		Vertex[] out = new Vertex[2];
+		// sort by x-coordinate (breaking ties by y-coordinate)
+		Vertex[] verticesByX = new Vertex[n];
+		for (int i = 0; i < n; i++)
+			verticesByX[i] = vertices.get(i);
+
+		Arrays.sort(verticesByX, Comparator.comparingInt((Vertex a) -> a._nX));
+
+		// check for coincident points
+		for (int i = 0; i < n - 1; i++) {
+			if (equalVertices(verticesByX[i], verticesByX[i + 1])) {
+				bestDistance = 0.0;
+				best1 = verticesByX[i];
+				best2 = verticesByX[i + 1];
+				out[0] = best1;
+				out[1] = best2;
+				return out;
+			}
+		}
+
+		// sort by y-coordinate (but not yet sorted)
+		Vertex[] verticesByY = new Vertex[n];
+		for (int i = 0; i < n; i++)
+			verticesByY[i] = verticesByX[i];
+
+		// auxiliary array
+		Vertex[] aux = new Vertex[n];
+
+		closest(verticesByX, verticesByY, aux, 0, n - 1);
+		out[0] = best1;
+		out[1] = best2;
+		return out;
+	}
+
+	private static double closest(Vertex[] verticesByX, Vertex[] verticesByY, Vertex[] aux, int lo, int hi) {
+		if (hi <= lo) {
+			return Double.POSITIVE_INFINITY;
+		}
+
+		int mid = lo + (hi - lo) / 2;
+		Vertex median = verticesByX[mid];
+
+		// compute closest pair with both endpoints in left subarray or both in right subarray
+		double delta1 = closest(verticesByX, verticesByY, aux, lo, mid);
+		double delta2 = closest(verticesByX, verticesByY, aux, mid + 1, hi);
+		double delta = Math.min(delta1, delta2);
+
+		// merge back so that pointsByY[lo..hi] are sorted by y-coordinate
+		merge(verticesByY, aux, lo, mid, hi);
+
+		// aux[0..m-1] = sequence of points closer than delta, sorted by y-coordinate
+		int m = 0;
+		for (int i = lo; i <= hi; i++) {
+			if (Math.abs(verticesByY[i]._nX - median._nX) < delta) {
+				aux[m++] = verticesByY[i];
+			}
+		}
+
+		// compare each point to its neighbors with y-coordinate closer than delta
+		for (int i = 0; i < m; i++) {
+			// a geometric packing argument shows that this loop iterates at most 7 times
+			for (int j = i + 1; (j < m) && (aux[j]._nY - aux[i]._nY < delta); j++) {
+				double dx = aux[i]._nX - aux[j]._nX;
+				double dy = aux[i]._nY - aux[j]._nY;
+				double distance = Math.sqrt(dx * dx + dy * dy);
+				if (distance < delta) {
+					delta = distance;
+					if (distance < bestDistance) {
+						bestDistance = delta;
+						best1 = aux[i];
+						best2 = aux[j];
+						System.out.println("better distance = " + delta + " from " + best1._strUniqueID + " to " + best2._strUniqueID);
+					}
+				}
+			}
+		}
+		return delta;
+	}
+
+	private static void merge(Vertex[] a, Vertex[] aux, int lo, int mid, int hi) {
+		// copy to aux[]
+		for (int k = lo; k <= hi; k++) {
+			aux[k] = a[k];
+		}
+
+		// merge back to a[]
+		int i = lo, j = mid + 1;
+		for (int k = lo; k <= hi; k++) {
+			if (i > mid) a[k] = aux[j++];
+			else if (j > hi) a[k] = aux[i++];
+			else if (less(aux[j], aux[i])) a[k] = aux[j++];
+			else a[k] = aux[i++];
+		}
+	}
+
+	private static boolean less(Vertex v, Vertex w) {
+		return compareTo(v, w) < 0;
+	}
+
+	public static int compareTo(Vertex a, Vertex that) {
+		if (that != null && a != null) {
+			if (a._nY < that._nY) return -1;
+			if (a._nY > that._nY) return +1;
+			if (a._nX < that._nX) return -1;
+			if (a._nX > that._nX) return +1;
+		}
+		return 0;
+	}
+
+	public static boolean equalVertices(Vertex a, Vertex b) {
+		return ((a._nX == b._nX) && (a._nY == b._nY));
+	}
+
+
 	public static void runTestCase1( ) throws GraphException{ 
 		
 	Graph g = new Graph( );
 	GradingVisitor gVisitor = new GradingVisitor( );
-	g.insertVertex("1", "1" ,0,0);
-	g.insertVertex("2", "2",0,0 );
-	g.insertVertex("3", "3" ,0,0);
-	g.insertVertex("4", "4" ,0,0);
-	g.insertVertex("5", "5" ,0,0); 
+	g.insertVertex("1", "1", 30, 7);
+	g.insertVertex("2", "2", 15, 30);
+	g.insertVertex("3", "3", 90, 50);
+	g.insertVertex("4", "4", 12, 9);
+	g.insertVertex("5", "5", 90, 4);
 	g.insertEdge("1","4","88","88",5);
 	g.insertEdge("1","2","2","2", 2);
 	g.insertEdge("2", "3","14","14",14);
@@ -279,18 +401,22 @@ public class Graph {
 	//g.insertEdge("3", "5 ", "34", "34", 34);
 	//g.dfs("1",gVisitor );
 	g.bfs("1", gVisitor);
-	
+	Vertex[] out = g.closestPair();
+	System.out.println("Point 1: " + out[0]._strUniqueID);
+	System.out.println("Point 2: " + out[1]._strUniqueID);
+
+
 	}
 
 	public static void runTestCase5() throws GraphException{ 
 		
 	Graph g = new Graph( );
 	GradingVisitor gVisitor = new GradingVisitor( );
-	g.insertVertex("1", "1" ,0,0);
-	g.insertVertex("2", "2",0,0 );
-	g.insertVertex("3", "3" ,0,0);
-	g.insertVertex("4", "4" ,0,0);
-	g.insertVertex("0", "0" ,0,0); 
+	g.insertVertex("1", "1", 0, 0);
+	g.insertVertex("2", "2", 1, 30);
+	g.insertVertex("3", "3", 9, 0);
+	g.insertVertex("4", "4", 0, 5);
+	g.insertVertex("0", "0", 0, 9);
 	g.insertEdge("0","1","1","88",6);
 	g.insertEdge("0","2","2","2", 1);
 	g.insertEdge("1", "2","3","14",14);
@@ -302,7 +428,11 @@ public class Graph {
 	//g.insertEdge("3", "5 ", "34", "34", 34);
 	//g.dfs("1",gVisitor );
 	g.dfs("1", gVisitor);
-	
+
+	Vertex[] out = g.closestPair();
+	System.out.println("Point 1: " + out[0]._strUniqueID);
+	System.out.println("Point 2: " + out[1]._strUniqueID);
+
 	}
 
 
@@ -315,10 +445,10 @@ public class Graph {
 	public static void main(String[]args) throws GraphException{
 		Graph Graph=new Graph();
 
-		Graph.insertVertex("1","1",0,0);
-		Graph.insertVertex("2","2",0,0);
-       
-        Graph.insertEdge("1", "2", "1", "5", 1);
+//		Graph.insertVertex("1","1",0,0);
+//		Graph.insertVertex("2","2",0,0);
+//
+//        Graph.insertEdge("1", "2", "1", "5", 1);
         //Graph.removeEdge("1");
 		//Graph.removeVertex("2");
 		//Graph.removeVertex("2");
@@ -351,7 +481,6 @@ public class Graph {
 		/*for(int i=0;i<Graph.Edges.size();i++){
 			System.out.println(Graph.Edges.get(i));
 		}*/
-
 
 	}
 }
