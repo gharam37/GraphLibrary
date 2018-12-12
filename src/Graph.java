@@ -200,26 +200,27 @@ public class Graph {
 		for (int i = 0; i < Vertices.size(); i++) {
 			if (Vertices.get(i).getUniqueID().equals(strVertex1UniqueID)) {
 				countFound++;
-				System.out.println(countFound);
+				//System.out.println(countFound);
 				Vertex1 = Vertices.get(i);
 				Vertex1Index = i;
 			}
 			if (Vertices.get(i).getUniqueID().equals(strVertex2UniqueID)) {
 				countFound++;
-				System.out.println(countFound);
+				//System.out.println(countFound);
 
 				Vertex2 = Vertices.get(i);
 				Vertex2Index = i;
 
 			}
 		}
-		if (countFound == 2) {
+		if (countFound >=2) {
 			Edge e = new Edge(strEdgeUniqueID, strEdgeData, nEdgeCost, Vertex1, Vertex2);
 			Edges.add(e);
 			Vertices.get(Vertex1Index).Adjeceny.add(Vertices.get(Vertex2Index));
 			Vertices.get(Vertex2Index).Adjeceny.add(Vertices.get(Vertex1Index));
 
 		} else {
+			System.out.println(countFound);
 			throw new GraphException("Failed to Insert One vertex doesn't exist");
 			/// Here a graph Exception
 		}
@@ -316,7 +317,7 @@ public class Graph {
 				while (queue.size() != 0) {
 					Vertex CurrentVertex = queue.remove();
 
-					System.out.println(CurrentVertex + " ");
+					//System.out.println(CurrentVertex + " ");
 					for (int j = 0; j < CurrentVertex.Adjeceny.size(); j++) {
 						if (!CurrentVertex.Adjeceny.get(j).visited) {
 							CurrentVertex.Adjeceny.get(j).visited = true;
@@ -341,7 +342,7 @@ public class Graph {
 		Vertex FirstVertex = null;
 		for (int i = 0; i < Vertices.size(); i++) {
 			if (Vertices.get(i).getUniqueID().equals(strStartVertexUniqueID)) {
-				if (Vertices.get(i).getUniqueID().equals(strEndVertexUniqueID)) {
+				if (Vertices.get(i).getUniqueID().equals(strEndVertexUniqueID) ) {
 					stopDfs = true;
 				}
 				foundInitialVertex = true;
@@ -349,7 +350,7 @@ public class Graph {
 				System.out.println("First Vertex " + FirstVertex + " ");
 				visitor.visit(FirstVertex);
 				VerticesStackdfs.push(FirstVertex);
-				System.out.println("size0 " + VerticesStackdfs.size());
+				//System.out.println("size0 " + VerticesStackdfs.size());
 				for (int j = 0; j < FirstVertex.Adjeceny.size(); j++) {
 					if (!FirstVertex.Adjeceny.get(j).visited) {
 						String ID = FirstVertex.Adjeceny.get(j)._strUniqueID;
@@ -593,13 +594,13 @@ public class Graph {
 		// g.insertEdge("3", "5 ", "34", "34", 34);
 		// g.dfs("1",gVisitor );
 
-		g.bfs("1", gVisitor);
+		//g.bfs("1", gVisitor);
 
 		Vertex[] out = g.closestPair();
 		System.out.println("Point 1: " + out[0]._strUniqueID);
 		System.out.println("Point 2: " + out[1]._strUniqueID);
 
-		//g.pathDFS("1", "5");
+		g.pathDFS("1", "5");
 	}
 
 	public static void runTestCase5() throws GraphException {
@@ -631,57 +632,222 @@ public class Graph {
 		// g.dfs("1",gVisitor );
 		//g.dfs("1", gVisitor);
 
-		Vertex[] out = g.closestPair();
+		/*Vertex[] out = g.closestPair();
 		System.out.println("Point 1: " + out[0]._strUniqueID);
 		System.out.println("Point 2: " + out[1]._strUniqueID);
 		g.pathDFS("1", "4");
 		g.findShortestPathBF("0");
+		System.out.println("Point 2: " + out[1]._strUniqueID);*/
+		//g.pathDFS("1", "4");
 
 	}
-
-	public static void main(String[] args) throws GraphException {
-		Graph Graph = new Graph();
-
-//		Graph.insertVertex("1","1",0,0);
-//		Graph.insertVertex("2","2",0,0);
-//
-//        Graph.insertEdge("1", "2", "1", "5", 1);
-		// Graph.removeEdge("1");
-		// Graph.removeVertex("2");
-		// Graph.removeVertex("2");
-
-		// System.out.println(Graph.opposite("1","1"));
-		// Vertex [] Vertices= Graph.endVertices("1");
-
-		/*
-		 * for(int i=0;i<Graph.Vertices.size();i++){
-		 * System.out.println(Graph.Vertices.get(i).Adjeceny.get(0)); //Printing head }
-		 */
-		// Graph.removeEdge("1");
-		for (int i = 0; i < Graph.Vertices.size(); i++) {
-			System.out.println(Graph.Vertices.get(i).Adjeceny.get(0)); // Printing head
+	public static Vector<Edge> SortEdges(Vector<Edge> Edges){
+		Vector<Edge> Output = new Vector<Edge>(50,1);
+		for(int i=0;i<Edges.size();i++){
+			Output.add(Edges.get(i));
+			
 		}
+		for( int i=0;i<Output.size()-1;i++){
+			int MinimumIndex=i;
+			for (int j = i+1; j < Output.size(); j++) {
+				if(Output.get(j)._nEdgeCost<Output.get(MinimumIndex)._nEdgeCost){
+					MinimumIndex=j;
+					
+				}
+			}
+
+			Edge temp= Output.get(MinimumIndex);
+			Output.set(MinimumIndex,Output.get(i));
+			Output.set(i, temp);
+			
+			
+		}
+		
+		return Output;
+		
+	}
+	public  Vector<PathSegment> minSpanningTree()
+			throws GraphException{
+		Vector<PathSegment> Output = new Vector<PathSegment>(50,1);
+		Vector<Edge> SortedEdges = SortEdges(Edges);
+		Vector<Vertex> OutputVertices = new Vector<Vertex>(50,1);
+        Graph Accumlator = new Graph();
+		int StopAt = Vertices.size();
+		int i=0;
+		boolean found1=false;
+		boolean found2=false;
+	    int countFound=0;
+
+        for(int k=0;k<Vertices.size();k++){
+        	Accumlator.insertVertex(Vertices.get(k)._strUniqueID,"",0,0);
+        }
+        for(int k=0;k<Accumlator.Vertices.size();k++){
+        	System.out.println(Accumlator.Vertices.get(k));
+        }
+ 		while( i<SortedEdges.size() &&Accumlator.Edges.size()<StopAt){
+
+
+            found1=false;
+            found2=false;
+            
+            Accumlator.insertEdge(SortedEdges.get(i).Vertex1._strUniqueID, SortedEdges.get(i).Vertex2._strUniqueID,
+            		SortedEdges.get(i)._strUniqueID, SortedEdges.get(i)._strData, SortedEdges.get(i).getCost());
+            
+
+            System.out.println();
+
+			if(isCyclic(Accumlator)){
+
+				Accumlator.removeEdge(SortedEdges.get(i)._strUniqueID);
+
+		}
+			i++;
+
+
+	}
+ 		for(int f=0;f<Accumlator.Edges.size();f++){
+ 			System.out.println(Accumlator.Edges.get(f)._strUniqueID);
+ 			PathSegment Segmant= new PathSegment();
+ 			Segmant._edge=Accumlator.Edges.get(f);
+ 			Output.add(Segmant);
+ 		}
+
+		return Output;
+
+	}
+	public static  void sort(int arr[]) 
+    { 
+        int n = arr.length; 
+  
+        // One by one move boundary of unsorted subarray 
+        for (int i = 0; i < n-1; i++) 
+        { 
+            // Find the minimum element in unsorted array 
+            int min_idx = i; 
+            for (int j = i+1; j < n; j++) 
+                if (arr[j] < arr[min_idx]) 
+                    min_idx = j; 
+  
+            // Swap the found minimum element with the first 
+            // element 
+            int temp = arr[min_idx]; 
+            arr[min_idx] = arr[i]; 
+            arr[i] = temp; 
+        } 
+    }
+	public static boolean isCyclicUtil(Vertex vertex, GradingVisitor Visitor, Vertex Parent) 
+    { 
+        Visitor.visit(vertex); 
+  
+        // Recur for all the vertices adjacent to this vertex 
+       for(int j=0;j<vertex.Adjeceny.size()-1;j++)
+        { 
+  
+    	   //System.out.println(vertex.Adjeceny.get(0));
+    	   //System.out.println(vertex._strUniqueID);
+
+    	   
+    	   //System.out.println(vertex.Adjeceny.get(1));
+
+            // If an adjacent is not visited, then recur for 
+            // that adjacent 
+            if (!vertex.Adjeceny.get(j+1).visited) 
+            { 
+                if (isCyclicUtil(vertex.Adjeceny.get(j+1), Visitor, vertex)) 
+                    return true; 
+            } 
+  
+            // If an adjacent is visited and not parent of  
+            // current vertex, then there is a cycle. 
+            else if (vertex  != Parent ) 
+               return true; 
+        } 
+        return false; 
+    } 
+	public static boolean isCyclic(Graph g){
+		
+		return isCyclicUtil(g.Vertices.get(0), new GradingVisitor (), null);
+	}
+	public static Graph subgraph(Graph g , Vector<Vertex>Verticies){
+		Graph Output=new Graph();
+		for(int i=0;i<Verticies.size();i++){
+			Output.Vertices.addElement(Verticies.get(i));
+			Vertex CurrentVertex=null;
+			for(int j=0;j<g.Vertices.size();j++){
+				CurrentVertex=g.Vertices.get(j);
+				if(CurrentVertex._strUniqueID.equals(Verticies.get(i)._strUniqueID)){
+					//System.out.println(CurrentVertex);
+					break;
+				}
+				
+				
+			}
+
+			LinkedList<Vertex> AdjecentInList = new LinkedList<Vertex> ();
+			for( int k=0;k<CurrentVertex.Adjeceny.size();k++){
+				for(int j=0;j<Verticies.size();j++){
+					if(Verticies.get(j)._strUniqueID.equals(CurrentVertex.Adjeceny.get(k)._strUniqueID)){
+				
+					//System.out.println("Here");
+					AdjecentInList.add(CurrentVertex.Adjeceny.get(k));
+					}
+				}
+				
+			}
+			Output.Vertices.get(Output.Vertices.size()-1).Adjeceny=AdjecentInList;
+
+		}
+		
+		return Output;
+	}
+	public static void main(String[] args) throws GraphException {
+		int[] ArrayToSort=new int[]{5,2,14,5,4};
+
+		
+		
+		Graph g = new Graph();
+		g.insertVertex("1", "1", 30, 7);
+		g.insertVertex("2", "2", 15, 30);
+		g.insertVertex("3", "3", 90, 50);
+		g.insertVertex("4", "4", 12, 9);
+		g.insertVertex("5", "5", 90, 4);
+		g.insertEdge("1", "4", "88", "88", 5);
+		g.insertEdge("1", "2", "2", "2", 2);
+		g.insertEdge("2", "3", "14", "14", 14);
+		g.insertEdge("2", "4", "99", "99", 5);
+		g.insertEdge("2", "5", "4", "4", 4);
+		
+        //Vertex C= new Vertex ("4", "4", 12, 9);
+
+
+        //newVertices.add(C);
+
+
+		GradingVisitor Visitor=  new GradingVisitor();
+		
+		Graph g2=new Graph();
+		g2.insertVertex("A", "1", 30, 7);
+		g2.insertVertex("B", "2", 15, 30);
+		g2.insertVertex("C", "3", 90, 50);
+		g2.insertVertex("D", "4", 12, 9);
+		g2.insertVertex("E", "5", 90, 4);
+		g2.insertVertex("F", "5", 90, 4);
+
+		g2.insertEdge("A", "C", "88", "88", 5);
+		g2.insertEdge("C", "B", "2", "2", 2);
+		g2.insertEdge("C", "E", "100", "100", 4);
+		g2.insertEdge("C", "D", "99", "99", 5);
+		g2.insertEdge("D", "F", "4", "4", 100);
+		
+        g.minSpanningTree();
+
+		System.out.println(isCyclic(g2));
+		
+
 		//runTestCase1();
-		runTestCase5();
+		//runTestCase5();
 
-		/*
-		 * for(int i=0;i<Graph.incidentEdges("1").size();i++){
-		 * System.out.println(Graph.incidentEdges("1").get(i)); }
-		 */
-
-		/*
-		 * for(int i=0;i<Graph.edges().size();i++){
-		 * System.out.println(Graph.edges().get(i)); }
-		 */
-		/*
-		 * for(int i=0;i<Graph.vertices().size();i++){
-		 * System.out.println(Graph.vertices().get(i)); }
-		 */
-
-		/*
-		 * for(int i=0;i<Graph.Edges.size();i++){
-		 * System.out.println(Graph.Edges.get(i)); }
-		 */
+	
 
 	}
 }

@@ -31,6 +31,7 @@ public class Vertex {
 		
 		
 	}
+	
 	public String getUniqueID( ){
 		return _strUniqueID;
 	}

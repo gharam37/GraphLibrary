@@ -6,7 +6,9 @@ public class Edge{
  public Vertex Vertex1;
  public Vertex Vertex2;
   boolean visited=false;
-
+    public Edge(){
+    	
+    }
 
 	public Edge(String _strUniqueID,String _strData,int cost,Vertex Vertex1,Vertex Vertex2){
 		this._strUniqueID=_strUniqueID;
