@@ -8,6 +8,7 @@ public class Vertex {
 	protected String _strData; 
 	protected int _nX,_nY;
 	boolean visited=false;
+	int order;
 	
     @Override
 	public String toString() {
@@ -15,11 +16,12 @@ public class Vertex {
 	}
 	LinkedList<Vertex> Adjeceny = new LinkedList<Vertex> (); //Sisters
 
-	public Vertex(String _strUniqueID,String _strData,int nx,int ny){
+	public Vertex(String _strUniqueID,String _strData,int nx,int ny, int order){
 		this._strUniqueID=_strUniqueID;
 		this._strData=_strData;
 		this._nX=nx;
 		this._nY=ny;
+		this.order = order;
 		
 		
 	}

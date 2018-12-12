@@ -10,6 +10,91 @@ public class Graph {
 	private static Vertex best1, best2;
 	private Deque<Vertex> VerticesStackdfs = new ArrayDeque<Vertex>();
 	private boolean stopDfs = false;
+	static int order = 0;
+
+	public Vector<Vector<PathSegment>> findShortestPathBF(
+			String strStartVertexUniqueID) throws GraphException {
+		Vector<Vector<PathSegment>> out = BellmanFord(this,this.getVertexByID(strStartVertexUniqueID));
+		for(int i =0;i<out.size();i++) {
+			for (int j = 0; j < out.elementAt(i).size(); j++) {
+				System.out.println("VERTEX1 " + out.elementAt(i).get(j)._edge.Vertex1._strUniqueID + " VERTEX2 " + out.elementAt(i).get(j)._edge.Vertex2._strUniqueID);
+			}
+			System.out.println("----------");
+		}
+		return out;
+	}
+
+	public static Vector<Vector<PathSegment>> BellmanFord(Graph graph, Vertex src) {
+		int V = graph.Vertices.size(), E = graph.Edges.size();
+		int dist[] = new int[V];
+		PathSegment predecessor[] = new PathSegment[V];
+
+		// Step 1: Initialize distances from src to all other
+		// vertices as INFINITE
+		for (int i = 0; i < V; ++i) {
+			dist[i] = Integer.MAX_VALUE;
+			predecessor[i] = null;
+		}
+		dist[src.order] = 0;
+
+		// Step 2: Relax all edges |V| - 1 times. A simple
+		// shortest path from src to any other vertex can
+		// have at-most |V| - 1 edges
+		for (int i = 1; i < V; ++i) {
+			for (int j = 0; j < E; ++j) {
+				Vertex u = graph.Edges.get(j).Vertex1;
+				Vertex v = graph.Edges.get(j).Vertex2;
+				int weight = graph.Edges.get(j)._nEdgeCost;
+				if (dist[u.order] != Integer.MAX_VALUE && dist[u.order] + weight < dist[v.order]) {
+					dist[v.order] = dist[u.order] + weight;
+					PathSegment ps = new PathSegment();
+					ps._vertex = u;
+					ps._edge = graph.Edges.get(j);
+					predecessor[v.order] = ps;
+					//System.out.println(" U: " + ps._vertex._strUniqueID + "V: "+v._strUniqueID + " E: " + ps._edge._strUniqueID);
+				}
+			}
+		}
+
+		Vector<Vector<PathSegment>> out = new Vector<>(50, 1);
+
+		for(int i=0;i<predecessor.length;i++){
+			if(i!=src.order) {
+				PathSegment p = predecessor[i];
+				Vector<PathSegment> parent = new Vector<>(50);
+				while(p._vertex._strUniqueID!=src._strUniqueID){
+					parent.addElement(p);
+					p = predecessor[p._vertex.order];
+				}
+				parent.add(p);
+				out.add(parent);
+
+			}
+		}
+		// Step 3: check for negative-weight cycles.  The above
+		// step guarantees shortest distances if graph doesn't
+		// contain negative weight cycle. If we get a shorter
+		//  path, then there is a cycle.
+		for (int j = 0; j < E; ++j) {
+			Vertex u = graph.Edges.get(j).Vertex1;
+			Vertex v = graph.Edges.get(j).Vertex2;
+			int weight = graph.Edges.get(j)._nEdgeCost;
+			if (dist[u.order] != Integer.MAX_VALUE &&
+					dist[u.order] + weight < dist[v.order])
+				System.out.println("Graph contains negative weight cycle");
+		}
+//        printArr(graph,dist, V);
+		return out;
+	}
+
+//    // A utility function used to print the solution
+//    public static void printArr(Graph g,int dist[], int V) {
+//        System.out.println("Vertex   Distance from Source");
+//        for (int i = 0; i < dist.length; ++i)
+//            System.out.println(g.Vertices.get(i)._strUniqueID + "\t\t" + dist[g.Vertices.get(i).order]);
+//    }
+
+
 
 	public void dfs(String strStartVertexUniqueID, Visitor visitor) throws GraphException {
 		// TODO: ask to remove stack
@@ -98,7 +183,7 @@ public class Graph {
 	}
 
 	public void insertVertex(String strUniqueID, String strData, int nX, int nY) throws GraphException {
-		Vertex v = new Vertex(strUniqueID, strData, nX, nY);
+		Vertex v = new Vertex(strUniqueID, strData, nX, nY, order++);
 		Vertices.add(v);
 		LinkedList<Vertex> VertexAdjeceny = new LinkedList<Vertex>();
 		VertexAdjeceny.add(v);
@@ -533,6 +618,14 @@ public class Graph {
 		g.insertEdge("1", "4", "5", "4", 4);
 		g.insertEdge("4", "3", "6", "99", 5);
 		g.insertEdge("3", "2", "7", "4", 4);
+
+		g.insertEdge("1", "0", "1", "88", 6);
+		g.insertEdge("2", "0", "2", "2", 1);
+		g.insertEdge("2", "1", "3", "14", 14);
+		g.insertEdge("3", "1", "4", "99", 5);
+		g.insertEdge("4", "1", "5", "4", 4);
+		g.insertEdge("3", "4", "6", "99", 5);
+		g.insertEdge("2", "3", "7", "4", 4);
 		// g.insertEdge("4", "5 ", "58", "58", 58);
 		// g.insertEdge("3", "5 ", "34", "34", 34);
 		// g.dfs("1",gVisitor );
@@ -542,6 +635,7 @@ public class Graph {
 		System.out.println("Point 1: " + out[0]._strUniqueID);
 		System.out.println("Point 2: " + out[1]._strUniqueID);
 		g.pathDFS("1", "4");
+		g.findShortestPathBF("0");
 
 	}
 
