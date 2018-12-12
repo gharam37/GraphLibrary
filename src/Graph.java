@@ -1,14 +1,15 @@
-import java.util.*; 
+import java.util.*;
 
 public class Graph {
 
 	private String LibraryName;
 	private String LibraryVersion;
-    private Vector<Vertex> Vertices=new Vector<Vertex>(50,1);
-    private Vector<Edge>  Edges= new  Vector<Edge> (50,1) ;
+	private Vector<Vertex> Vertices = new Vector<Vertex>(50, 1);
+	private Vector<Edge> Edges = new Vector<Edge>(50, 1);
 	private static double bestDistance = Double.POSITIVE_INFINITY;
 	private static Vertex best1, best2;
-	private Vector<String> dfsUniqueId = new Vector<String>();
+	private Deque<Vertex> VerticesStackdfs = new ArrayDeque<Vertex>();
+	private boolean stopDfs = false;
 
 	public void dfs(String strStartVertexUniqueID, Visitor visitor) throws GraphException {
 		// TODO: ask to remove stack
@@ -23,7 +24,7 @@ public class Graph {
 
 				visitor.visit(FirstVertex);
 				VertciesStack.push(FirstVertex);
-				dfsUniqueId.add(FirstVertex._strUniqueID);
+
 				for (int j = 0; j < FirstVertex.Adjeceny.size(); j++) {
 					if (!FirstVertex.Adjeceny.get(j).visited) {
 						String ID = FirstVertex.Adjeceny.get(j)._strUniqueID;
@@ -37,133 +38,122 @@ public class Graph {
 		}
 
 	}
-	public String getLibraryName( ){
-		
+
+	public String getLibraryName() {
+
 		return LibraryName;
 	}
-    
-	
-	public Vector<Vertex> vertices()throws GraphException
-	
+
+	public Vector<Vertex> vertices() throws GraphException
+
 	{
 		return Vertices;
 	}
-	public Vector<Edge> edges() throws GraphException{
+
+	public Vector<Edge> edges() throws GraphException {
 		return Edges;
-		
+
 	}
-	public Vertex[] endVertices(String strEdgeUniqueID)
-			throws GraphException{
-		Vertex Vertices[]=new Vertex[2];
-		for(int i=0;i<Edges.size();i++){
-			if(Edges.get(i).getUniqueID().equals(strEdgeUniqueID)){
-				Vertices[0]=Edges.get(i).Vertex1;
-				Vertices[1]=Edges.get(i).Vertex2;
+
+	public Vertex[] endVertices(String strEdgeUniqueID) throws GraphException {
+		Vertex Vertices[] = new Vertex[2];
+		for (int i = 0; i < Edges.size(); i++) {
+			if (Edges.get(i).getUniqueID().equals(strEdgeUniqueID)) {
+				Vertices[0] = Edges.get(i).Vertex1;
+				Vertices[1] = Edges.get(i).Vertex2;
 				break;
 
 			}
-			
+
 		}
 		return Vertices;
 	}
-	public String getLibraryVersion( ){
-		
+
+	public String getLibraryVersion() {
+
 		return LibraryVersion;
 	}
-	public Vertex opposite(String strVertexUniqueID,
-	String strEdgeUniqueID) throws
-	GraphException{
-		Vertex Opposite=null;
-		for(int i=0;i<Edges.size();i++){
-			if(Edges.get(i).getUniqueID().equals(strEdgeUniqueID)){
-				if(Edges.get(i).Vertex1._strUniqueID.equals(strVertexUniqueID))
-				{
-					Opposite = Edges.get(i).Vertex2; 
-				break;
-				}
-				else if(Edges.get(i).Vertex2._strUniqueID.equals(strVertexUniqueID))
-						{
-					Opposite = Edges.get(i).Vertex1; 
+
+	public Vertex opposite(String strVertexUniqueID, String strEdgeUniqueID) throws GraphException {
+		Vertex Opposite = null;
+		for (int i = 0; i < Edges.size(); i++) {
+			if (Edges.get(i).getUniqueID().equals(strEdgeUniqueID)) {
+				if (Edges.get(i).Vertex1._strUniqueID.equals(strVertexUniqueID)) {
+					Opposite = Edges.get(i).Vertex2;
+					break;
+				} else if (Edges.get(i).Vertex2._strUniqueID.equals(strVertexUniqueID)) {
+					Opposite = Edges.get(i).Vertex1;
 
 					break;
 				}
 
 			}
-			
+
 		}
-		if(Opposite==null){
+		if (Opposite == null) {
 			throw new GraphException("Edge or Vertix not found");
 
-			
 		}
 		return Opposite;
 	}
-	public void insertVertex(String strUniqueID,
-			String strData,
-			int nX,
-			int nY) throws GraphException{
-		Vertex v=new Vertex(strUniqueID,strData,nX,nY);
+
+	public void insertVertex(String strUniqueID, String strData, int nX, int nY) throws GraphException {
+		Vertex v = new Vertex(strUniqueID, strData, nX, nY);
 		Vertices.add(v);
-	   LinkedList<Vertex> VertexAdjeceny = new LinkedList<Vertex>();
-	   VertexAdjeceny.add(v);
-	       
+		LinkedList<Vertex> VertexAdjeceny = new LinkedList<Vertex>();
+		VertexAdjeceny.add(v);
 
 	}
-	public void insertEdge(String strVertex1UniqueID,
-	String strVertex2UniqueID,
-	String strEdgeUniqueID,
-	String strEdgeData,
-	int nEdgeCost) throws GraphException{
-		int countFound =0;
-		Vertex Vertex1=null;
-		Vertex Vertex2=null;
-		int Vertex1Index=-1;
-		int Vertex2Index=-1;
-		for(int i=0;i<Vertices.size();i++){
-			if(Vertices.get(i).getUniqueID().equals(strVertex1UniqueID)){
+
+	public void insertEdge(String strVertex1UniqueID, String strVertex2UniqueID, String strEdgeUniqueID,
+			String strEdgeData, int nEdgeCost) throws GraphException {
+		int countFound = 0;
+		Vertex Vertex1 = null;
+		Vertex Vertex2 = null;
+		int Vertex1Index = -1;
+		int Vertex2Index = -1;
+		for (int i = 0; i < Vertices.size(); i++) {
+			if (Vertices.get(i).getUniqueID().equals(strVertex1UniqueID)) {
 				countFound++;
 				System.out.println(countFound);
 				Vertex1 = Vertices.get(i);
-				Vertex1Index=i;
+				Vertex1Index = i;
 			}
-			if(Vertices.get(i).getUniqueID().equals(strVertex2UniqueID)){
+			if (Vertices.get(i).getUniqueID().equals(strVertex2UniqueID)) {
 				countFound++;
 				System.out.println(countFound);
 
 				Vertex2 = Vertices.get(i);
-				Vertex2Index=i;
+				Vertex2Index = i;
 
 			}
 		}
-		if(countFound==2){
-			Edge e=new Edge(strEdgeUniqueID,strEdgeData,nEdgeCost,Vertex1,Vertex2);
+		if (countFound == 2) {
+			Edge e = new Edge(strEdgeUniqueID, strEdgeData, nEdgeCost, Vertex1, Vertex2);
 			Edges.add(e);
 			Vertices.get(Vertex1Index).Adjeceny.add(Vertices.get(Vertex2Index));
 			Vertices.get(Vertex2Index).Adjeceny.add(Vertices.get(Vertex1Index));
 
-			
-		}
-		else{
+		} else {
 			throw new GraphException("Failed to Insert One vertex doesn't exist");
 			/// Here a graph Exception
 		}
-		
-		
-	}
-	public void removeEdge(String strEdgeUniqueID) throws
-	GraphException{
-		for(int i=0;i<Edges.size();i++){
-			if(Edges.get(i).getUniqueID().equals(strEdgeUniqueID)){
-				Vertex Vertex1=Edges.get(i).Vertex1;
-				Vertex Vertex2=Edges.get(i).Vertex2;
 
-				for(int j=0;j<Vertex1.Adjeceny.size();j++){
-					if(Vertex1.Adjeceny.get(j)._strUniqueID.equals(Vertex2._strUniqueID)){
+	}
+
+	public void removeEdge(String strEdgeUniqueID) throws GraphException {
+		for (int i = 0; i < Edges.size(); i++) {
+			if (Edges.get(i).getUniqueID().equals(strEdgeUniqueID)) {
+				Vertex Vertex1 = Edges.get(i).Vertex1;
+				Vertex Vertex2 = Edges.get(i).Vertex2;
+
+				for (int j = 0; j < Vertex1.Adjeceny.size(); j++) {
+					if (Vertex1.Adjeceny.get(j)._strUniqueID.equals(Vertex2._strUniqueID)) {
 						Vertex1.Adjeceny.remove(j);
 					}
 				}
-				for(int j=0;j<Vertex2.Adjeceny.size();j++){
-					if(Vertex2.Adjeceny.get(j)._strUniqueID.equals(Vertex1._strUniqueID)){
+				for (int j = 0; j < Vertex2.Adjeceny.size(); j++) {
+					if (Vertex2.Adjeceny.get(j)._strUniqueID.equals(Vertex1._strUniqueID)) {
 						Vertex2.Adjeceny.remove(j);
 					}
 				}
@@ -172,129 +162,180 @@ public class Graph {
 			}
 
 		}
-		
+
 		throw new GraphException("Couldn't find Edge");
-		
-		
+
 	}
-	public void removeVertex(String strVertexUniqueID) throws
-	GraphException{
-		boolean found=false;
-		for(int i=0;i<Vertices.size();i++){
-			if(Vertices.get(i).getUniqueID().equals(strVertexUniqueID)){
-				found =true;
+
+	public void removeVertex(String strVertexUniqueID) throws GraphException {
+		boolean found = false;
+		for (int i = 0; i < Vertices.size(); i++) {
+			if (Vertices.get(i).getUniqueID().equals(strVertexUniqueID)) {
+				found = true;
 				Vertices.remove(Vertices.get(i));
-				for(int j=0;j<Edges.size();j++){
-					String VertexID1=Edges.get(j).Vertex1.getUniqueID();
-					String VertexID2=Edges.get(j).Vertex2.getUniqueID();
+				for (int j = 0; j < Edges.size(); j++) {
+					String VertexID1 = Edges.get(j).Vertex1.getUniqueID();
+					String VertexID2 = Edges.get(j).Vertex2.getUniqueID();
 
-					if(VertexID1.equals(strVertexUniqueID) ||
-					VertexID2.equals(strVertexUniqueID) ){
+					if (VertexID1.equals(strVertexUniqueID) || VertexID2.equals(strVertexUniqueID)) {
 						Edges.remove(j);
-						
+
 					}
 				}
-				
+
 			}
 
 		}
-		if(!found){
-		throw new GraphException("Couldn't find Vertex");
+		if (!found) {
+			throw new GraphException("Couldn't find Vertex");
 		}
-		
+
 	}
-	public Vector<Edge> incidentEdges(String strVertexUniqueID)
-			throws GraphException{
-		Vector<Edge> incidentEdges=new Vector<Edge>();
-		boolean found=false;
-		for(int i=0;i<Vertices.size();i++){
-			if(Vertices.get(i).getUniqueID().equals(strVertexUniqueID)){
-				found=true;
-				for(int j=0;j<Edges.size();j++){
-					String VertexID1=Edges.get(j).Vertex1.getUniqueID();
-					String VertexID2=Edges.get(j).Vertex2.getUniqueID();
 
-					if(VertexID1.equals(strVertexUniqueID) ||
-					VertexID2.equals(strVertexUniqueID) ){
+	public Vector<Edge> incidentEdges(String strVertexUniqueID) throws GraphException {
+		Vector<Edge> incidentEdges = new Vector<Edge>();
+		boolean found = false;
+		for (int i = 0; i < Vertices.size(); i++) {
+			if (Vertices.get(i).getUniqueID().equals(strVertexUniqueID)) {
+				found = true;
+				for (int j = 0; j < Edges.size(); j++) {
+					String VertexID1 = Edges.get(j).Vertex1.getUniqueID();
+					String VertexID2 = Edges.get(j).Vertex2.getUniqueID();
+
+					if (VertexID1.equals(strVertexUniqueID) || VertexID2.equals(strVertexUniqueID)) {
 						incidentEdges.add(Edges.get(j));
-						
+
 					}
 				}
-				
-				
+
 			}
 
 		}
-		if(!found){
+		if (!found) {
 			throw new GraphException("Couldn't find Vertex");
 		}
 		return incidentEdges;
 	}
-	
-	
-	public void bfs(String strStartVertexUniqueID,
-			Visitor visitor) throws GraphException{
-        LinkedList<Vertex> queue = new LinkedList<Vertex>(); 
-    	boolean foundInitialVertex=false;
-    	Vertex FirstVertex=null;
-    	for (int i=0;i<Vertices.size();i++){
-    		if(Vertices.get(i).getUniqueID().equals(strStartVertexUniqueID)){
-    			foundInitialVertex=true;
-    			FirstVertex=Vertices.get(i);
-    			queue.add(FirstVertex);
-    		    visitor.visit(FirstVertex);
 
-    		
-    		    while(queue.size() != 0){
-        		    Vertex CurrentVertex=queue.remove();
+	public void bfs(String strStartVertexUniqueID, Visitor visitor) throws GraphException {
+		LinkedList<Vertex> queue = new LinkedList<Vertex>();
+		boolean foundInitialVertex = false;
+		Vertex FirstVertex = null;
+		for (int i = 0; i < Vertices.size(); i++) {
+			if (Vertices.get(i).getUniqueID().equals(strStartVertexUniqueID)) {
+				foundInitialVertex = true;
+				FirstVertex = Vertices.get(i);
+				queue.add(FirstVertex);
+				visitor.visit(FirstVertex);
 
-    		    	System.out.println(CurrentVertex+" "); 
-    		    	for(int j=0;j<CurrentVertex.Adjeceny.size();j++){
-    		    		if(!CurrentVertex.Adjeceny.get(j).visited){
-    		    			CurrentVertex.Adjeceny.get(j).visited=true;
-    		    			queue.add(CurrentVertex.Adjeceny.get(j));
-    		    			
-    		    		}
-    		    	}
+				while (queue.size() != 0) {
+					Vertex CurrentVertex = queue.remove();
 
-    		    	
-    		    	
-    		    }
-    		    
-			}
-    	}
-		
-	}
-	public Vector<PathSegment> pathDFS(String strStartVertexUniqueID, String strEndVertexUniqueID)
-			throws GraphException {
-		Vector<PathSegment> output = new Vector<PathSegment>(50, 1);
-		Vector<Edge> edge1 = new Vector<Edge>();
-		Vector<Edge> edge2 = new Vector<Edge>();
-		PathSegment pathSegment = new PathSegment();
-		GradingVisitor gVisitor = new GradingVisitor();
+					System.out.println(CurrentVertex + " ");
+					for (int j = 0; j < CurrentVertex.Adjeceny.size(); j++) {
+						if (!CurrentVertex.Adjeceny.get(j).visited) {
+							CurrentVertex.Adjeceny.get(j).visited = true;
+							queue.add(CurrentVertex.Adjeceny.get(j));
 
-		// dfs on the points required
-		dfs(strStartVertexUniqueID, gVisitor);
-		// get the edges and the vertices of the dfs between start and end vertex
-		for (int i = 0; i < dfsUniqueId.size() - 1; i++) {
-			//reach the end vertex
-			if (dfsUniqueId.get(i) == strEndVertexUniqueID) {
-				break;
-			}
-
-			edge1 = incidentEdges(dfsUniqueId.get(i));
-			edge2 = incidentEdges(dfsUniqueId.get(i + 1));
-			for (int j = 0; j < edge2.size(); j++) {
-				if (edge1.contains(edge2.get(j))) {
-					pathSegment._edge = edge2.get(j);
-					pathSegment._vertex = getVertexByID(dfsUniqueId.get(i));
-					output.add(pathSegment);
-					System.out.println("PathSegment Edge: "+pathSegment._edge._strUniqueID+"PathSegment Vertex: "+ pathSegment._vertex._strUniqueID);
+						}
+					}
 
 				}
+
+			}
+		}
+
+	}
+
+	// a helper dfs method for pathdfs
+	public void dfs(String strStartVertexUniqueID, String strEndVertexUniqueID, Visitor visitor) throws GraphException {
+		if (stopDfs) {
+			return;
+		}
+		boolean foundInitialVertex = false;
+		Vertex FirstVertex = null;
+		for (int i = 0; i < Vertices.size(); i++) {
+			if (Vertices.get(i).getUniqueID().equals(strStartVertexUniqueID)) {
+				if (Vertices.get(i).getUniqueID().equals(strEndVertexUniqueID)) {
+					stopDfs = true;
+				}
+				foundInitialVertex = true;
+				FirstVertex = Vertices.get(i);
+				System.out.println("First Vertex " + FirstVertex + " ");
+				visitor.visit(FirstVertex);
+				VerticesStackdfs.push(FirstVertex);
+				System.out.println("size0 " + VerticesStackdfs.size());
+				for (int j = 0; j < FirstVertex.Adjeceny.size(); j++) {
+					if (!FirstVertex.Adjeceny.get(j).visited) {
+						String ID = FirstVertex.Adjeceny.get(j)._strUniqueID;
+						dfs(ID, strEndVertexUniqueID, visitor);
+
+					}
+
+				}
+
 			}
 
 		}
+	}
+
+	public Vector<PathSegment> pathDFS(String strStartVertexUniqueID, String strEndVertexUniqueID)
+			throws GraphException {
+		Vector<PathSegment> output = new Vector<PathSegment>(50, 1);
+		PathSegment pathSegment = new PathSegment();
+		GradingVisitor gVisitor = new GradingVisitor();
+		Deque<Vertex> VerticesStackdfs2 = new ArrayDeque<Vertex>();
+
+		// dfs on the points required from the start vertex to the end vertex
+		stopDfs = false;
+		dfs(strStartVertexUniqueID, strEndVertexUniqueID, gVisitor);
+
+		int size = VerticesStackdfs.size();
+		//check if a path exists if it only contains one element
+		if (size == 1) {
+			pathSegment._edge = getCommonEdge(strStartVertexUniqueID, strEndVertexUniqueID);
+			pathSegment._vertex = VerticesStackdfs.pop();
+			if (pathSegment._edge == null) {
+				throw new GraphException("No path between these vertices");
+			}
+			System.out.println("PathSegment Edge: " + pathSegment._edge._strUniqueID + "PathSegment Vertex: "
+					+ pathSegment._vertex);
+			output.add(pathSegment);
+			return output;
+		}
+		// check that all vertices resulted from dfs have path between each other
+		// VertciesStackdfs2 will have the wanted vertices
+		VerticesStackdfs2.push(getVertexByID(strEndVertexUniqueID));
+		Vertex last = getVertexByID(strEndVertexUniqueID);
+		if (last._strUniqueID.equals(strEndVertexUniqueID)) {
+			VerticesStackdfs.pop();
+		}
+		for (int j = 0; j < size - 1; j++) {
+			if (getCommonEdge(last._strUniqueID, VerticesStackdfs.peek()._strUniqueID) == null) {
+				System.out.println("IN: " + VerticesStackdfs.pop());
+			} else {
+				last = VerticesStackdfs.pop();
+				VerticesStackdfs2.push(last);
+			}
+		}
+
+		System.out.println("size: " + VerticesStackdfs2.size());
+		// get the edges and the vertices of the dfs between start and end vertex
+		size = VerticesStackdfs2.size();
+		//if the stack contains only one element it means there is no path exist
+		if (size == 1) {
+			throw new GraphException("No path between these vertices");
+		}
+		for (int i = 0; i < size - 1; i++) {
+			Vertex vertex = VerticesStackdfs2.pop();
+			pathSegment._edge = getCommonEdge(vertex._strUniqueID, VerticesStackdfs2.peek()._strUniqueID);
+			pathSegment._vertex = vertex;
+			output.add(pathSegment);
+			System.out.println("PathSegment Edge: " + pathSegment._edge._strUniqueID + "PathSegment Vertex: "
+					+ pathSegment._vertex._strUniqueID);
+
+		}
+
 		return output;
 	}
 
@@ -307,10 +348,24 @@ public class Graph {
 		return null;
 	}
 
-	public Vertex[] closestPair() throws GraphException{
-    	Vector<Vertex> vertices = this.Vertices;
+	// a helper method that takes as parameter ID of 2 vertices and return the edge
+	// between them or return null if no edge between them
+	public Edge getCommonEdge(String uniqueId1, String uniqueId2) throws GraphException {
+		Vector<Edge> edge2 = incidentEdges(uniqueId2);
+		for (int j = 0; j < edge2.size(); j++) {
+			System.out.println("test1 " + edge2.get(j)._strUniqueID);
+			if (opposite(uniqueId2, edge2.get(j)._strUniqueID)._strUniqueID == uniqueId1) {
+				return edge2.get(j);
+			}
+		}
+		return null;
+	}
+
+	public Vertex[] closestPair() throws GraphException {
+		Vector<Vertex> vertices = this.Vertices;
 		int n = vertices.size();
-		if (n <= 1) return null;
+		if (n <= 1)
+			return null;
 
 		Vertex[] out = new Vertex[2];
 		// sort by x-coordinate (breaking ties by y-coordinate)
@@ -354,7 +409,8 @@ public class Graph {
 		int mid = lo + (hi - lo) / 2;
 		Vertex median = verticesByX[mid];
 
-		// compute closest pair with both endpoints in left subarray or both in right subarray
+		// compute closest pair with both endpoints in left subarray or both in right
+		// subarray
 		double delta1 = closest(verticesByX, verticesByY, aux, lo, mid);
 		double delta2 = closest(verticesByX, verticesByY, aux, mid + 1, hi);
 		double delta = Math.min(delta1, delta2);
@@ -383,7 +439,8 @@ public class Graph {
 						bestDistance = delta;
 						best1 = aux[i];
 						best2 = aux[j];
-						System.out.println("better distance = " + delta + " from " + best1._strUniqueID + " to " + best2._strUniqueID);
+						System.out.println("better distance = " + delta + " from " + best1._strUniqueID + " to "
+								+ best2._strUniqueID);
 					}
 				}
 			}
@@ -400,10 +457,14 @@ public class Graph {
 		// merge back to a[]
 		int i = lo, j = mid + 1;
 		for (int k = lo; k <= hi; k++) {
-			if (i > mid) a[k] = aux[j++];
-			else if (j > hi) a[k] = aux[i++];
-			else if (less(aux[j], aux[i])) a[k] = aux[j++];
-			else a[k] = aux[i++];
+			if (i > mid)
+				a[k] = aux[j++];
+			else if (j > hi)
+				a[k] = aux[i++];
+			else if (less(aux[j], aux[i]))
+				a[k] = aux[j++];
+			else
+				a[k] = aux[i++];
 		}
 	}
 
@@ -413,10 +474,14 @@ public class Graph {
 
 	public static int compareTo(Vertex a, Vertex that) {
 		if (that != null && a != null) {
-			if (a._nY < that._nY) return -1;
-			if (a._nY > that._nY) return +1;
-			if (a._nX < that._nX) return -1;
-			if (a._nX > that._nX) return +1;
+			if (a._nY < that._nY)
+				return -1;
+			if (a._nY > that._nY)
+				return +1;
+			if (a._nX < that._nX)
+				return -1;
+			if (a._nX > that._nX)
+				return +1;
 		}
 		return 0;
 	}
@@ -425,99 +490,104 @@ public class Graph {
 		return ((a._nX == b._nX) && (a._nY == b._nY));
 	}
 
+	public static void runTestCase1() throws GraphException {
 
-	public static void runTestCase1( ) throws GraphException{ 
-		
-	Graph g = new Graph( );
-	GradingVisitor gVisitor = new GradingVisitor( );
-	g.insertVertex("1", "1", 30, 7);
-	g.insertVertex("2", "2", 15, 30);
-	g.insertVertex("3", "3", 90, 50);
-	g.insertVertex("4", "4", 12, 9);
-	g.insertVertex("5", "5", 90, 4);
-	g.insertEdge("1","4","88","88",5);
-	g.insertEdge("1","2","2","2", 2);
-	g.insertEdge("2", "3","14","14",14);
-	g.insertEdge("2", "4","99","99",5);
-	g.insertEdge("2", "5","4","4",4);
-	//g.insertEdge("4", "5 ", "58", "58", 58);
-	//g.insertEdge("3", "5 ", "34", "34", 34);
-	//g.dfs("1",gVisitor );
-	g.bfs("1", gVisitor);
-	Vertex[] out = g.closestPair();
-	System.out.println("Point 1: " + out[0]._strUniqueID);
-	System.out.println("Point 2: " + out[1]._strUniqueID);
-	g.pathDFS("1", "3");
+		Graph g = new Graph();
+		GradingVisitor gVisitor = new GradingVisitor();
+		g.insertVertex("1", "1", 30, 7);
+		g.insertVertex("2", "2", 15, 30);
+		g.insertVertex("3", "3", 90, 50);
+		g.insertVertex("4", "4", 12, 9);
+		g.insertVertex("5", "5", 90, 4);
+		g.insertEdge("1", "4", "88", "88", 5);
+		g.insertEdge("1", "2", "2", "2", 2);
+		g.insertEdge("2", "3", "14", "14", 14);
+		g.insertEdge("2", "4", "99", "99", 5);
+		g.insertEdge("2", "5", "4", "4", 4);
+		// g.insertEdge("4", "5 ", "58", "58", 58);
+		// g.insertEdge("3", "5 ", "34", "34", 34);
+		// g.dfs("1",gVisitor );
+
+		g.bfs("1", gVisitor);
+
+		Vertex[] out = g.closestPair();
+		System.out.println("Point 1: " + out[0]._strUniqueID);
+		System.out.println("Point 2: " + out[1]._strUniqueID);
+
+		//g.pathDFS("1", "5");
+	}
+
+	public static void runTestCase5() throws GraphException {
+
+		Graph g = new Graph();
+		GradingVisitor gVisitor = new GradingVisitor();
+		g.insertVertex("1", "1", 0, 0);
+		g.insertVertex("2", "2", 1, 30);
+		g.insertVertex("3", "3", 9, 0);
+		g.insertVertex("4", "4", 0, 5);
+		g.insertVertex("0", "0", 0, 9);
+		g.insertEdge("0", "1", "1", "88", 6);
+		g.insertEdge("0", "2", "2", "2", 1);
+		g.insertEdge("1", "2", "3", "14", 14);
+		g.insertEdge("1", "3", "4", "99", 5);
+		g.insertEdge("1", "4", "5", "4", 4);
+		g.insertEdge("4", "3", "6", "99", 5);
+		g.insertEdge("3", "2", "7", "4", 4);
+		// g.insertEdge("4", "5 ", "58", "58", 58);
+		// g.insertEdge("3", "5 ", "34", "34", 34);
+		// g.dfs("1",gVisitor );
+		//g.dfs("1", gVisitor);
+
+		Vertex[] out = g.closestPair();
+		System.out.println("Point 1: " + out[0]._strUniqueID);
+		System.out.println("Point 2: " + out[1]._strUniqueID);
+		g.pathDFS("1", "4");
 
 	}
 
-	public static void runTestCase5() throws GraphException{ 
-		
-	Graph g = new Graph( );
-	GradingVisitor gVisitor = new GradingVisitor( );
-	g.insertVertex("1", "1", 0, 0);
-	g.insertVertex("2", "2", 1, 30);
-	g.insertVertex("3", "3", 9, 0);
-	g.insertVertex("4", "4", 0, 5);
-	g.insertVertex("0", "0", 0, 9);
-	g.insertEdge("0","1","1","88",6);
-	g.insertEdge("0","2","2","2", 1);
-	g.insertEdge("1", "2","3","14",14);
-	g.insertEdge("1", "3","4","99",5);
-	g.insertEdge("1", "4","5","4",4);
-	g.insertEdge("4", "3","6","99",5);
-	g.insertEdge("3", "2","7","4",4);
-	//g.insertEdge("4", "5 ", "58", "58", 58);
-	//g.insertEdge("3", "5 ", "34", "34", 34);
-	//g.dfs("1",gVisitor );
-	g.dfs("1", gVisitor);
-
-	Vertex[] out = g.closestPair();
-	System.out.println("Point 1: " + out[0]._strUniqueID);
-	System.out.println("Point 2: " + out[1]._strUniqueID);
-	g.pathDFS("1", "4");
-
-	}
-
-	public static void main(String[]args) throws GraphException{
-		Graph Graph=new Graph();
+	public static void main(String[] args) throws GraphException {
+		Graph Graph = new Graph();
 
 //		Graph.insertVertex("1","1",0,0);
 //		Graph.insertVertex("2","2",0,0);
 //
 //        Graph.insertEdge("1", "2", "1", "5", 1);
-        //Graph.removeEdge("1");
-		//Graph.removeVertex("2");
-		//Graph.removeVertex("2");
-        
-		//System.out.println(Graph.opposite("1","1"));
-        //Vertex [] Vertices= Graph.endVertices("1");
-        
-        
-        /*for(int i=0;i<Graph.Vertices.size();i++){
-    		System.out.println(Graph.Vertices.get(i).Adjeceny.get(0)); //Printing head 
-    	}*/
-        //Graph.removeEdge("1");
-        for(int i=0;i<Graph.Vertices.size();i++){
-    		System.out.println(Graph.Vertices.get(i).Adjeceny.get(0)); //Printing head 
-    	}
-        //runTestCase1();
-        runTestCase5();
-    
-        /*for(int i=0;i<Graph.incidentEdges("1").size();i++){
-		System.out.println(Graph.incidentEdges("1").get(i));
-	   }*/
-        
-		/*for(int i=0;i<Graph.edges().size();i++){
-			System.out.println(Graph.edges().get(i));
-		}*/
-		/*for(int i=0;i<Graph.vertices().size();i++){
-			System.out.println(Graph.vertices().get(i));
-		}*/
-        
-		/*for(int i=0;i<Graph.Edges.size();i++){
-			System.out.println(Graph.Edges.get(i));
-		}*/
+		// Graph.removeEdge("1");
+		// Graph.removeVertex("2");
+		// Graph.removeVertex("2");
+
+		// System.out.println(Graph.opposite("1","1"));
+		// Vertex [] Vertices= Graph.endVertices("1");
+
+		/*
+		 * for(int i=0;i<Graph.Vertices.size();i++){
+		 * System.out.println(Graph.Vertices.get(i).Adjeceny.get(0)); //Printing head }
+		 */
+		// Graph.removeEdge("1");
+		for (int i = 0; i < Graph.Vertices.size(); i++) {
+			System.out.println(Graph.Vertices.get(i).Adjeceny.get(0)); // Printing head
+		}
+		//runTestCase1();
+		runTestCase5();
+
+		/*
+		 * for(int i=0;i<Graph.incidentEdges("1").size();i++){
+		 * System.out.println(Graph.incidentEdges("1").get(i)); }
+		 */
+
+		/*
+		 * for(int i=0;i<Graph.edges().size();i++){
+		 * System.out.println(Graph.edges().get(i)); }
+		 */
+		/*
+		 * for(int i=0;i<Graph.vertices().size();i++){
+		 * System.out.println(Graph.vertices().get(i)); }
+		 */
+
+		/*
+		 * for(int i=0;i<Graph.Edges.size();i++){
+		 * System.out.println(Graph.Edges.get(i)); }
+		 */
 
 	}
 }
