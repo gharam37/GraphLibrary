@@ -804,18 +804,18 @@ public class Graph {
 		int[] ArrayToSort=new int[]{5,2,14,5,4};
 
 		
-		
-		Graph g = new Graph();
-		g.insertVertex("1", "1", 30, 7);
-		g.insertVertex("2", "2", 15, 30);
-		g.insertVertex("3", "3", 90, 50);
-		g.insertVertex("4", "4", 12, 9);
-		g.insertVertex("5", "5", 90, 4);
-		g.insertEdge("1", "4", "88", "88", 5);
-		g.insertEdge("1", "2", "2", "2", 2);
-		g.insertEdge("2", "3", "14", "14", 14);
-		g.insertEdge("2", "4", "99", "99", 5);
-		g.insertEdge("2", "5", "4", "4", 4);
+//
+//		Graph g = new Graph();
+//		g.insertVertex("1", "1", 30, 7);
+//		g.insertVertex("2", "2", 15, 30);
+//		g.insertVertex("3", "3", 90, 50);
+//		g.insertVertex("4", "4", 12, 9);
+//		g.insertVertex("5", "5", 90, 4);
+//		g.insertEdge("1", "4", "88", "88", 5);
+//		g.insertEdge("1", "2", "2", "2", 2);
+//		g.insertEdge("2", "3", "14", "14", 14);
+//		g.insertEdge("2", "4", "99", "99", 5);
+//		g.insertEdge("2", "5", "4", "4", 4);
 		
         //Vertex C= new Vertex ("4", "4", 12, 9);
 
@@ -839,10 +839,12 @@ public class Graph {
 		g2.insertEdge("C", "D", "99", "99", 5);
 		g2.insertEdge("D", "F", "4", "4", 100);
 		
-        g.minSpanningTree();
+        //g.minSpanningTree();
 
 		System.out.println(isCyclic(g2));
-		
+		//g.getVertexByID("A");
+		System.out.println( g2.getVertexByID("A").order);
+		g2.findShortestPathBF("A");
 
 		//runTestCase1();
 		//runTestCase5();
