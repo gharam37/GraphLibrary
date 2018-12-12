@@ -631,6 +631,42 @@ public class Graph {
         } 
         return false; 
     } 
+	public static boolean isCyclic(Graph g){
+		
+		return isCyclicUtil(g.Vertices.get(0), new GradingVisitor (), null);
+	}
+	public static Graph subgraph(Graph g , Vector<Vertex>Verticies){
+		Graph Output=new Graph();
+		for(int i=0;i<Verticies.size();i++){
+			Output.Vertices.addElement(Verticies.get(i));
+			Vertex CurrentVertex=null;
+			for(int j=0;j<g.Vertices.size();j++){
+				CurrentVertex=g.Vertices.get(i);
+				if(CurrentVertex._strUniqueID.equals(Verticies.get(i)._strUniqueID)){
+					//System.out.println(CurrentVertex);
+					break;
+				}
+				
+				
+			}
+
+			LinkedList<Vertex> AdjecentInList = new LinkedList<Vertex> ();
+			for( int k=0;k<CurrentVertex.Adjeceny.size();k++){
+				for(int j=0;j<Verticies.size();j++){
+					if(Verticies.get(j)._strUniqueID.equals(CurrentVertex.Adjeceny.get(k)._strUniqueID)){
+				
+					//System.out.println("Here");
+					AdjecentInList.add(CurrentVertex.Adjeceny.get(k));
+					}
+				}
+				
+			}
+			Output.Vertices.get(Output.Vertices.size()-1).Adjeceny=AdjecentInList;
+
+		}
+		
+		return Output;
+	}
 	public static void main(String[] args) throws GraphException {
 		int[] ArrayToSort=new int[]{5,2,14,5,4};
 
@@ -648,6 +684,24 @@ public class Graph {
 		g.insertEdge("2", "4", "99", "99", 5);
 		g.insertEdge("2", "5", "4", "4", 4);
 		
+        Vertex A = new Vertex("1", "1", 30, 7);	
+        Vertex B= new Vertex ("2", "2", 15, 30);
+        //Vertex C= new Vertex ("4", "4", 12, 9);
+
+        Vector<Vertex> newVertices=new Vector<Vertex>();
+        newVertices.add(A);
+        newVertices.add(B);
+        //newVertices.add(C);
+
+		Graph SubGraph=subgraph(g,newVertices);
+		for(int i=0;i<SubGraph.Vertices.size();i++){
+			//System.out.println("Entered");
+			for(int j=0;j<SubGraph.Vertices.get(i).Adjeceny.size();j++){
+				System.out.print(SubGraph.Vertices.get(i).Adjeceny.get(j)._strUniqueID);
+			}
+			System.out.println("Entered");
+
+		}
 		GradingVisitor Visitor=  new GradingVisitor();
 		
 		Graph g2=new Graph();
@@ -663,7 +717,8 @@ public class Graph {
 		g2.insertEdge("C", "E", "14", "14", 14);
 		g2.insertEdge("C", "D", "99", "99", 5);
 		g2.insertEdge("D", "F", "4", "4", 4);
-		System.out.println(isCyclicUtil(g2.Vertices.get(0),Visitor,null));
+		
+		System.out.println(isCyclic(SubGraph));
 		
 
 		//runTestCase1();
