@@ -128,13 +128,14 @@ public class Graph {
 
 			}
 		}
-		if (countFound == 2) {
+		if (countFound >=2) {
 			Edge e = new Edge(strEdgeUniqueID, strEdgeData, nEdgeCost, Vertex1, Vertex2);
 			Edges.add(e);
 			Vertices.get(Vertex1Index).Adjeceny.add(Vertices.get(Vertex2Index));
 			Vertices.get(Vertex2Index).Adjeceny.add(Vertices.get(Vertex1Index));
 
 		} else {
+			System.out.println(countFound);
 			throw new GraphException("Failed to Insert One vertex doesn't exist");
 			/// Here a graph Exception
 		}
@@ -231,7 +232,7 @@ public class Graph {
 				while (queue.size() != 0) {
 					Vertex CurrentVertex = queue.remove();
 
-					System.out.println(CurrentVertex + " ");
+					//System.out.println(CurrentVertex + " ");
 					for (int j = 0; j < CurrentVertex.Adjeceny.size(); j++) {
 						if (!CurrentVertex.Adjeceny.get(j).visited) {
 							CurrentVertex.Adjeceny.get(j).visited = true;
@@ -569,18 +570,54 @@ public class Graph {
 		return Output;
 		
 	}
-	public Vector<PathSegment> minSpanningTree()
+	public  Vector<PathSegment> minSpanningTree()
 			throws GraphException{
 		Vector<PathSegment> Output = new Vector<PathSegment>(50,1);
-		Vector<Edge> SortedEdges = SortEdges(this.Edges);
-		
-		
-		
-		
+		Vector<Edge> SortedEdges = SortEdges(Edges);
+		Vector<Vertex> OutputVertices = new Vector<Vertex>(50,1);
+        Graph Accumlator = new Graph();
+		int StopAt = Vertices.size();
+		int i=0;
+		boolean found1=false;
+		boolean found2=false;
+	    int countFound=0;
+
+        for(int k=0;k<Vertices.size();k++){
+        	Accumlator.insertVertex(Vertices.get(k)._strUniqueID,"",0,0);
+        }
+        for(int k=0;k<Accumlator.Vertices.size();k++){
+        	System.out.println(Accumlator.Vertices.get(k));
+        }
+ 		while( i<SortedEdges.size() &&Accumlator.Edges.size()<StopAt){
+
+
+            found1=false;
+            found2=false;
+            
+            Accumlator.insertEdge(SortedEdges.get(i).Vertex1._strUniqueID, SortedEdges.get(i).Vertex2._strUniqueID,
+            		SortedEdges.get(i)._strUniqueID, SortedEdges.get(i)._strData, SortedEdges.get(i).getCost());
+            
+
+            System.out.println();
+
+			if(isCyclic(Accumlator)){
+
+				Accumlator.removeEdge(SortedEdges.get(i)._strUniqueID);
+
+		}
+			i++;
+
+
+	}
+ 		for(int f=0;f<Accumlator.Edges.size();f++){
+ 			System.out.println(Accumlator.Edges.get(f)._strUniqueID);
+ 			PathSegment Segmant= new PathSegment();
+ 			Segmant._edge=Accumlator.Edges.get(f);
+ 			Output.add(Segmant);
+ 		}
+
 		return Output;
-		
-		
-		
+
 	}
 	public static  void sort(int arr[]) 
     { 
@@ -610,8 +647,8 @@ public class Graph {
        for(int j=0;j<vertex.Adjeceny.size()-1;j++)
         { 
   
-    	   System.out.println(vertex.Adjeceny.get(0));
-    	   System.out.println(vertex._strUniqueID);
+    	   //System.out.println(vertex.Adjeceny.get(0));
+    	   //System.out.println(vertex._strUniqueID);
 
     	   
     	   //System.out.println(vertex.Adjeceny.get(1));
@@ -641,7 +678,7 @@ public class Graph {
 			Output.Vertices.addElement(Verticies.get(i));
 			Vertex CurrentVertex=null;
 			for(int j=0;j<g.Vertices.size();j++){
-				CurrentVertex=g.Vertices.get(i);
+				CurrentVertex=g.Vertices.get(j);
 				if(CurrentVertex._strUniqueID.equals(Verticies.get(i)._strUniqueID)){
 					//System.out.println(CurrentVertex);
 					break;
@@ -694,14 +731,7 @@ public class Graph {
         //newVertices.add(C);
 
 		Graph SubGraph=subgraph(g,newVertices);
-		for(int i=0;i<SubGraph.Vertices.size();i++){
-			//System.out.println("Entered");
-			for(int j=0;j<SubGraph.Vertices.get(i).Adjeceny.size();j++){
-				System.out.print(SubGraph.Vertices.get(i).Adjeceny.get(j)._strUniqueID);
-			}
-			System.out.println("Entered");
 
-		}
 		GradingVisitor Visitor=  new GradingVisitor();
 		
 		Graph g2=new Graph();
@@ -714,11 +744,13 @@ public class Graph {
 
 		g2.insertEdge("A", "C", "88", "88", 5);
 		g2.insertEdge("C", "B", "2", "2", 2);
-		g2.insertEdge("C", "E", "14", "14", 14);
+		g2.insertEdge("C", "E", "100", "100", 4);
 		g2.insertEdge("C", "D", "99", "99", 5);
-		g2.insertEdge("D", "F", "4", "4", 4);
+		g2.insertEdge("D", "F", "4", "4", 100);
 		
-		System.out.println(isCyclic(SubGraph));
+        g2.minSpanningTree();
+
+		System.out.println(isCyclic(g2));
 		
 
 		//runTestCase1();
