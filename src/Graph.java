@@ -12,6 +12,118 @@ public class Graph {
 	private boolean stopDfs = false;
 	static int order = 0;
 
+	///
+	final static int INF = 99999;
+
+	public Vector<Vector<PathSegment>> findAllShortestPathsFW() throws GraphException {
+		int size = Vertices.size();
+		Vector<Vector<PathSegment>> shortestPAth=new Vector<Vector<PathSegment>>();;
+		PathSegment pathSegment = new PathSegment();
+		Vector<PathSegment> path = new Vector<PathSegment>(50, 1);
+		int dist[][] = new int[size][size];
+		int i, j, k;
+		System.out.println("Size: " + size);
+
+		for (i = 0; i < size; i++) {
+			for (j = 0; j < size; j++) {
+				if (i == j) {
+					dist[i][j] = 0;
+				}
+				else {
+					if(edgeBetVertices(Vertices.get(i)._strUniqueID, Vertices.get(j)._strUniqueID)!= null) {
+						dist[i][j] = edgeBetVertices(Vertices.get(i)._strUniqueID, Vertices.get(j)._strUniqueID)._nEdgeCost;
+					}
+					else {
+						dist[i][j] = INF;
+					}
+				}
+			}
+		}
+
+		/*
+		 * Add all vertices one by one to the set of intermediate vertices. ---> Before
+		 * start of an iteration, we have shortest distances between all pairs of
+		 * vertices such that the shortest distances consider only the vertices in set
+		 * {0, 1, 2, .. k-1} as intermediate vertices. ----> After the end of an
+		 * iteration, vertex no. k is added to the set of intermediate vertices and the
+		 * set becomes {0, 1, 2, .. k}
+		 */
+		for (k = 0; k < size; k++) {
+			// Pick all vertices as source one by one
+			for (i = 0; i < size; i++) {
+				// Pick all vertices as destination for the
+				// above picked source
+				for (j = 0; j < size; j++) {
+					// If vertex k is on the shortest path from
+					// i to j, then update the value of dist[i][j]
+					if (dist[i][k] + dist[k][j] < dist[i][j]) {
+						dist[i][j] = dist[i][k] + dist[k][j];
+
+						/*pathSegment._vertex=Vertices.get(i);
+						pathSegment._edge=edgeBetVertices(Vertices.get(i)._strUniqueID, Vertices.get(k)._strUniqueID);
+						path.add(pathSegment);
+						System.out.println("PathSegment1 Vertex: "+pathSegment._vertex._strUniqueID + "Edge "+ pathSegment._edge._strUniqueID);
+
+						pathSegment._vertex=Vertices.get(k);
+						pathSegment._edge=edgeBetVertices(Vertices.get(k)._strUniqueID, Vertices.get(j)._strUniqueID);
+						path.add(pathSegment);
+						System.out.println("PathSegment2 Vertex: "+pathSegment._vertex._strUniqueID + "Edge "+ pathSegment._edge._strUniqueID);
+						shortestPAth.add(path);*/
+
+					}
+
+				}
+			}
+		}
+
+		// Print the shortest distance matrix
+		printSolution(dist);
+		display(shortestPAth);
+
+		return null;
+
+	}
+	void printSolution(int dist[][])
+	{
+		System.out.println("The following matrix shows the shortest "+
+				"distances between every pair of vertices");
+		for (int i=0; i<Vertices.size(); ++i)
+		{
+			for (int j=0; j<Vertices.size(); ++j)
+			{
+				if (dist[i][j]==INF)
+					System.out.print("INF ");
+				else
+					System.out.print(dist[i][j]+"   ");
+			}
+			System.out.println();
+		}
+	}
+	void display(Vector<Vector<PathSegment>> pathSegmant) {
+
+		for (int i = 0; i < pathSegmant.size(); i++){
+			Vector inner = (Vector)pathSegmant.elementAt(i);
+			for (int j = 0; j < inner.size(); j++) {
+				Edge edge = pathSegmant.get(i).get(j)._edge;
+				Vertex vertex = pathSegmant.get(i).get(j)._vertex;
+				System.out.println("Edge " + edge._strUniqueID + " Vertex "+vertex._strUniqueID);
+			}
+			System.out.println();
+		}
+	}
+	public Edge edgeBetVertices(String VertexID1, String VertexID2) throws GraphException {
+		Vector<Edge> edge1 = new Vector<Edge>();
+		Vector<Edge> edge2 = new Vector<Edge>();
+		edge1 = incidentEdges(VertexID1);
+		edge2 = incidentEdges(VertexID2);
+		for (int l = 0; l < edge2.size(); l++) {
+			if (edge1.contains(edge2.get(l))) {
+				return edge2.get(l);
+			}
+		}
+		return null;
+	}
+
 	public Vector<Vector<PathSegment>> findShortestPathBF(
 			String strStartVertexUniqueID) throws GraphException {
 		Vector<Vector<PathSegment>> out = BellmanFord(this,this.getVertexByID(strStartVertexUniqueID));
@@ -845,6 +957,8 @@ public class Graph {
 		//g.getVertexByID("A");
 		System.out.println( g2.getVertexByID("A").order);
 		g2.findShortestPathBF("A");
+		g2.findAllShortestPathsFW();
+		g2.findAllShortestPathsFW();
 
 		//runTestCase1();
 		//runTestCase5();
